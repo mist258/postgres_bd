@@ -107,11 +107,19 @@ SELECT customer_name, email FROM customers WHERE customers.email LIKE '%@gmail.c
 SELECT SUM(orders.quantity) FROM orders;
 
 -- Поверніть суму всіх замовлень юзера з айді 1 (Не забувайте враховувати поле quantity)
+SELECT orders.order_id, orders.customer_id,product_pame,  quantity * price AS general_sum
+FROM orders JOIN products p on p.product_id = orders.customer_id WHERE customer_id=1;
 
 -- Поверніть всі замовлення, де кількість товарів більша за 1
+SELECT order_id, quantity, p.product_id, product_pame, price
+FROM orders JOIN products p on p.product_id = orders.product_id WHERE quantity > 1;
 
 -- Поверніть всіх постачальників в кого людина для звʼязку - "Vlad Ushakov"
+SELECT prod_supliers_id, name, contact_name, suplier_date
+FROM supliers JOIN product_supliers ps on supliers.suplier_id = ps.suplier_id WHERE name='Vlad Ushakov';
 
 -- Поверніть кількість замовлень, яку зробив юзер з конкретним айді
+SELECT quantity FROM orders JOIN customers c on c.customer_id = orders.customer_id WHERE c.customer_id=5;
 
 -- Виведіть всі замовлення, які були створені після 1 січня 24 року
+SELECT * FROM orders WHERE order_date > '2024-01-01';
