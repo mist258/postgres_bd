@@ -86,3 +86,4 @@ INSERT INTO info_customer_book VALUES
                                    (5, 6),
                                    (5, 3),
                                    (6, 8);
+
