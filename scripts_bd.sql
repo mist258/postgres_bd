@@ -1,3 +1,4 @@
+
 CREATE TABLE book (
     book_id SERIAL PRIMARY KEY,
     title VARCHAR (50) NOT NULL ,
@@ -51,8 +52,8 @@ CREATE TABLE employee (
 
 CREATE TABLE customer (
     customer_id int PRIMARY KEY,
-    cust_name VARCHAR (50) NOT NULL ,
-    email VARCHAR (50) UNIQUE NOT NULL,
+    cust_name VARCHAR (50) NOT NULL,
+    city VARCHAR (30) NOT NULL,
     fk_cust_empl_id int REFERENCES employee (employee_id) NOT NULL
 );
 INSERT INTO employee VALUES
@@ -67,6 +68,9 @@ INSERT INTO customer VALUES
                          (4, 'Lucy', 'lucy.lib@gmail.com', 2),
                          (5, 'Sam', 'sam.lib@gmail.com', 3),
                          (6, 'Kelli', 'kelli.lib@gmail.com', 3);
+
+ALTER TABLE customer
+ADD COLUMN city VARCHAR (30);
 
 -- зв'язок між таб. customer та book (one to many)
 CREATE TABLE info_customer_book
@@ -87,3 +91,14 @@ INSERT INTO info_customer_book VALUES
                                    (5, 3),
                                    (6, 8);
 
+ALTER TABLE book
+ADD COLUMN  quantity int;
+-- get some info
+SELECT title, isbn FROM book;
+SELECT cust_name FROM customer WHERE cust_name LIKE '_a_';
+SELECT cust_name FROM customer WHERE cust_name LIKE 'K%' OR cust_name LIKE 'S%';
+SELECT title FROM book WHERE quantity NOT BETWEEN 3 AND 8;
+SELECT title FROM book WHERE quantity > 3;
+SELECT name FROM author WHERE length(name) >= 13;
+SELECT book.title, book.quantity, author.name FROM book JOIN author ON author.author_id = book.book_id;
+SELECT book.title, cust_name, customer_id FROM book JOIN customer c on c.customer_id = book.book_id where book.title LIKE '%a%';
