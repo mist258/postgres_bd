@@ -159,8 +159,8 @@ SELECT book.genre, COUNT(book.genre) AS quantity FROM book GROUP BY genre;
 -- Створіть SQL-запит, який показує кількість працівників в кожній бібліотечній філії. Використайте GROUP BY.
 SELECT employee.empl_name, branch_id, COUNT(employee.empl_name) AS QUANTITY FROM employee GROUP BY employee.empl_name, branch_id;
 
---????Створіть SQL-запит, який показує користувачів, які позичили більше 5 книг. Використайте HAVING.
-SELECT cust_id, SUM(count_records) AS quantity FROM borrow_records GROUP BY cust_id HAVING COUNT(count_records) > 5;
+--Створіть SQL-запит, який показує користувачів, які позичили більше 5 книг. Використайте HAVING.
+SELECT cust_id, title, SUM(count_records) AS quantity FROM borrow_records GROUP BY cust_id, title HAVING SUM(count_records) > 5;
 
 -- Створіть SQL-запит, який виводить жанри, для яких у бібліотеці є більше 10 книг. Використайте HAVING.
 
