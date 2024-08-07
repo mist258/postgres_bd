@@ -151,12 +151,16 @@ INSERT INTO book_copies VALUES
 
 
 -- Створіть SQL-запит, який виводить кількість книг, які були позичені кожним користувачем. Використайте GROUP BY.
+SELECT borrow_records.count_records, COUNT(*) AS quantity FROM borrow_records GROUP BY count_records;
 
 -- Створіть SQL-запит, який виводить кількість книг кожного жанру в бібліотеці. Використайте GROUP BY.
+SELECT book.genre, COUNT(book.genre) AS quantity FROM book GROUP BY genre;
 
 -- Створіть SQL-запит, який показує кількість працівників в кожній бібліотечній філії. Використайте GROUP BY.
+SELECT employee.empl_name, branch_id, COUNT(employee.empl_name) AS QUANTITY FROM employee GROUP BY employee.empl_name, branch_id;
 
--- Створіть SQL-запит, який показує користувачів, які позичили більше 5 книг. Використайте HAVING.
+--????Створіть SQL-запит, який показує користувачів, які позичили більше 5 книг. Використайте HAVING.
+SELECT cust_id, SUM(count_records) AS quantity FROM borrow_records GROUP BY cust_id HAVING COUNT(count_records) > 5;
 
 -- Створіть SQL-запит, який виводить жанри, для яких у бібліотеці є більше 10 книг. Використайте HAVING.
 
