@@ -14,6 +14,7 @@ CREATE TABLE customer (
     first_name VARCHAR (50) NOT NULL,
     last_name VARCHAR (50) NOT NULL
 );
+ALTER TABLE customer DROP COLUMN last_name;
 
 CREATE TABLE country (
     country_id INT PRIMARY KEY,
@@ -71,12 +72,12 @@ INSERT INTO employee VALUES
                          (7, 2, 'Chris');
 
 INSERT INTO customer VALUES
-                         (1, 'Megan', 'Roiz'),
-                         (2, 'Chris', 'Wats'),
-                         (3, 'John', 'Henry'),
-                         (4, 'Lucy', 'White'),
-                         (5, 'Sam','Norton'),
-                         (6, 'John', 'Snow');
+                         (1, 'Megan'),
+                         (2, 'Chris'),
+                         (3, 'John'),
+                         (4, 'Lucy'),
+                         (5, 'Sam'),
+                         (6, 'John');
 
 INSERT INTO country VALUES
                         (1, 'Ukraine', 1, 1),
@@ -149,7 +150,6 @@ INSERT INTO book_copies VALUES
                             (10, 4, 4),
                             (11, 6, 5);
 
-
 -- Створіть SQL-запит, який виводить кількість книг, які були позичені кожним користувачем. Використайте GROUP BY.
 SELECT borrow_records.count_records, COUNT(*) AS quantity FROM borrow_records GROUP BY count_records;
 
@@ -163,36 +163,82 @@ SELECT employee.empl_name, branch_id, COUNT(employee.empl_name) AS QUANTITY FROM
 SELECT cust_id, title, SUM(count_records) AS quantity FROM borrow_records GROUP BY cust_id, title HAVING SUM(count_records) > 5;
 
 -- Створіть SQL-запит, який виводить жанри, для яких у бібліотеці є більше 10 книг. Використайте HAVING.
+SELECT book.genre, COUNT(book.genre) AS quantity_genry FROM book  GROUP BY book.genre HAVING COUNT(genre) > 10;
 
 -- Створіть SQL-запит, який показує бібліотечні філії, де працює більше 5 працівників. Використайте HAVING.
+SELECT branch_id, COUNT(branch_id) AS quantity_empl FROM employee GROUP BY branch_id HAVING COUNT(branch_id) > 5;
 
 -- Створіть SQL-запит, який виводить повний список імен усіх користувачів та працівників. Використайте UNION.
+SELECT customer.first_name FROM customer
+UNION ALL
+SELECT employee.empl_name FROM employee;
 
 -- Створіть SQL-запит, який об'єднує список усіх країн, з яких є користувачі, та країн, де працюють працівники.
 -- Використайте UNION.
+SELECT country_name, first_name FROM country JOIN customer c on c.customer_id = country.country_cust_id
+UNION ALL
+SELECT country_name, empl_name FROM country JOIN employee e on e.employee_id = country.country_empl_id;
 
 -- Створіть SQL-запит, який виводить імена, які є і серед користувачів, і серед працівників. Використайте INTERSECT.
+SELECT customer.first_name FROM customer
+INTERSECT
+SELECT employee.empl_name FROM employee;
 
 -- Створіть SQL-запит, який виводить країни, з яких є як користувачі, так і працівники. Використайте INTERSECT.
+SELECT country.country_name FROM country JOIN customer c on c.customer_id = country.country_cust_id
+INTERSECT
+SELECT country.country_name FROM country JOIN employee e on e.employee_id = country.country_empl_id;
 
 -- Створіть SQL-запит, який виводить імена користувачів, які не використовуються працівниками. Використайте EXCEPT.
+SELECT customer.first_name FROM customer
+EXCEPT
+SELECT employee.empl_name FROM employee;
 
--- Це означає, що ви маєте показати тільки ті імена користувачів, які не зустрічаються серед імен працівників.
 -- Створіть SQL-запит, який виводить країни, з яких є користувачі, але не працівники. Використайте EXCEPT.
+SELECT country_name, customer_id FROM country JOIN customer c on c.customer_id = country.country_cust_id
+EXCEPT
+SELECT country_name, employee_id FROM employee JOIN country c on employee.employee_id = c.country_empl_id;
 
 -- Пов'яжіть таблиці users та borrow_records, використовуючи INNER JOIN на id користувача та user_id запису про позичання.
 -- Виведіть імена користувачів (first_name, last_name) та borrow_date.
+SELECT first_name, borrow_date FROM customer INNER JOIN borrow_records br on customer.customer_id = br.cust_id;
 
 -- Додайте до попереднього запиту групування по користувачам (first_name, last_name). Виведіть імена користувачів та кількість їхніх записів про позичання.
+SELECT first_name, count_records FROM customer
+    JOIN borrow_records br on customer.customer_id = br.cust_id GROUP BY first_name, count_records;
 
 -- До попереднього запиту додайте сортування за кількістю записів про позичання від більшого до меншого (DESC) і обмежте вивід першими 10 результатами.
+SELECT first_name, count_records FROM customer
+    JOIN borrow_records br on customer.customer_id = br.cust_id GROUP BY first_name, count_records ORDER BY count_records DESC LIMIT 10;
+
 -- 2. Виведіть інформацію про всіх користувачів і книги, які вони позичили (якщо позичили).
 -- Для цього використайте LEFT JOIN між таблицями users, borrow_records, book_copies та books.
+SELECT * FROM customer LEFT JOIN borrow_records br on customer.customer_id = br.cust_id
+LEFT JOIN book b on b.book_id = br.borrow_book_id
+FULL JOIN book_copies bc on b.book_id = bc.book_copies_id;
 
 -- Додайте до попереднього запиту умову вибірки лише тих користувачів, які позичили хоча б одну книгу (WHERE books.title IS NOT NULL).
+SELECT * FROM customer LEFT JOIN borrow_records br on customer.customer_id = br.cust_id
+LEFT JOIN book b on b.book_id = br.borrow_book_id
+FULL JOIN book_copies bc on b.book_id = bc.book_copies_id
+WHERE borrow_book_id IS NOT NULL;
 
 -- Додайте до попереднього запиту агрегатну функцію для підрахунку кількості книг, які позичив кожен користувач.
--- 3. Використайте FULL JOIN для з'єднання таблиць employees та library_branches, виведіть імена співробітників та назву філії, в якій вони працюють.
+SELECT customer.customer_id, customer.first_name, COUNT(br.borrow_book_id) AS number_of_books
+FROM customer
+LEFT JOIN borrow_records br ON customer.customer_id = br.cust_id
+LEFT JOIN book b ON b.book_id = br.borrow_book_id
+LEFT JOIN book_copies bc ON b.book_id = bc.book_copies_id
+WHERE br.borrow_book_id IS NOT NULL
+GROUP BY customer.customer_id, customer.first_name;
+
+-- Використайте FULL JOIN для з'єднання таблиць employees та library_branches, виведіть імена співробітників та назву філії, в якій вони працюють.
+SELECT empl_name, branch_name FROM employee FULL JOIN lib_branches lb on lb.branch_id = employee.branch_id;
 
 -- Додайте до попереднього запиту з'єднання з третьою таблицею users, з'єднайте її по country, а потім відфільтруйте результат,
 -- щоб показати лише тих користувачів і співробітників, які проживають у США.
+SELECT employee.empl_name, u.first_name, count.country_name
+FROM employee
+FULL JOIN country count ON employee.employee_id = count.country_empl_id
+FULL JOIN customer u ON u.customer_id = count.country_cust_id
+WHERE count.country_name = 'USA';
